@@ -1,5 +1,4 @@
 name: test
-permissions: write-all
 
 on:
   push:
@@ -12,7 +11,11 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-
+    permissions:
+      pull-requests: write
+      contents: read
+      id-token: write
+      
     steps:
       - name: Check out repo code
         uses: actions/checkout@v3
@@ -28,20 +31,13 @@ jobs:
       - name: Run tests
         run: |
           python -m pytest -v tests
-
-      - name: Build coverage file
+      
+      - name: Build coverage report
         run: |
-          python -m pytest --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov . | tee pytest-coverage.txt
-
+          pytest --junitxml=pytest.xml --cov=. tests/ | tee pytest-coverage.txt
+      
       - name: Pytest coverage comment
         uses: MishaKav/pytest-coverage-comment@main
         with:
           pytest-coverage-path: ./pytest-coverage.txt
           junitxml-path: ./pytest.xml
-
-      - name: Check test results and mark workflow as failed if necessary
-        run: |
-          if grep -q 'FAILED' pytest-coverage.txt; then
-            echo 'Test case failed. Marking workflow as failed.'
-            exit 1
-          fi
