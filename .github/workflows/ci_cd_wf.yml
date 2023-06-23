@@ -13,10 +13,10 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
-      contents: read
-      id-token: write
+    # permissions:
+    #   pull-requests: write
+    #   contents: read
+    #   id-token: write
       
     steps:
       - name: Check out repo code
